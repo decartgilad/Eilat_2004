@@ -74,9 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingDiv.className = 'success-message loading';
         loadingDiv.innerHTML = `
             <div style="text-align: center;">
-                <img src="Assets/ajax-loader-small.gif" alt="טוען..." style="display: block; margin: 0 auto; margin-bottom: 15px;">
-                <br>
-                ${message}
+                <img src="Assets/ajax-loader-small.gif" alt="טוען..." style="display: block; margin: 0 auto; margin-bottom: 10px;">
+                <div style="margin-top: 5px;">${message}</div>
             </div>
         `;
         
@@ -215,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading immediately with GIF
             const settings = getCurrentSettings();
-            let loadingMessage = 'מתחיל לנתח את התמונה... (התמונה תיחתך ליחס 4:3)';
+            let loadingMessage = 'מתחיל לנתח את התמונה...';
             
             showLoadingMessage(loadingMessage);
             
@@ -266,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 lastCompressedImage = compressedBlob;
                 
                             // Show compression success message
-            showMessage('התמונה נדחסה ונחתכה בהצלחה ליחס 4:3!', 'success');
+            showMessage('התמונה נדחסה בהצלחה!', 'success');
                 
                 // Update loading message
                 const container = loadingDiv.parentNode;
@@ -275,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Show appropriate message based on cropping setting
-                showLoadingMessage('מנתח את התמונה... (התמונה נחתכה ליחס 4:3)');
+                showLoadingMessage('מנתח את התמונה...');
                 
                 // Convert compressed blob to base64
                 const reader = new FileReader();
@@ -484,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('Image URL found:', data.images[0].url);
                         displayGeneratedImage(data.images[0].url);
                         
-                        let successMessage = `תמונה חדשה נוצרה בהצלחה! (נשלחה ביחס 4:3, ${originalWidth}x${originalHeight})`;
+                        let successMessage = `תמונה חדשה נוצרה בהצלחה! (${originalWidth}x${originalHeight})`;
                         
                         showMessage(successMessage, 'success');
                     } else {
