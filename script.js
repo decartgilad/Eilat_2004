@@ -264,8 +264,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Store compressed image for "try again" functionality
                 lastCompressedImage = compressedBlob;
                 
-                            // Show compression success message
-            showMessage('התמונה נדחסה בהצלחה!', 'success');
+                // Show compression success message
+                showMessage('התמונה נדחסה בהצלחה!', 'success');
                 
                 // Update loading message
                 const container = loadingDiv.parentNode;
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         prompt: "Please analyze this image and describe it according to the style guidelines above. If the image doesn't match the 2000s Israeli youth aesthetic, describe what changes would be needed to make it fit that style.",
                         system_prompt: promptToUse,
                         model: "google/gemini-flash-1.5",
-                        image_url: base64Image
+                        image_url: cleanBase64
                     };
                     
                     // Send to FAL AI Vision
@@ -308,14 +308,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(response => {
                         console.log('Response status:', response.status);
-                        console.log('Response headers:', response.headers);
                         
                         if (!response.ok) {
-                            // Log more details about the error
-                            return response.text().then(errorText => {
-                                console.error('Error response body:', errorText);
-                                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
-                            });
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
                         return response.json();
                     })
@@ -346,10 +341,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         console.log('Generated Prompt:', generatedPrompt);
                         
-                        // Prompt generated successfully (display elements removed from UI)
+                        // Prompt generated successfully
                         console.log('Prompt generated successfully:', generatedPrompt);
                         
-                                        let successMessage = 'פרומפט נוצר בהצלחה! עכשיו מייצר תמונה חדשה...';
+                        let successMessage = 'פרומפט נוצר בהצלחה! עכשיו מייצר תמונה חדשה...';
                         
                         showMessage(successMessage, 'success');
                         
@@ -397,128 +392,85 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('generateImageWithFAL called with prompt:', prompt);
         
         const settings = getCurrentSettings();
-        
         let loadingMessage = 'יוצר תמונה חדשה... חכה רגע...';
-        
         const loadingDiv = showLoadingMessage(loadingMessage);
         
-        // Get original image dimensions from the compressed blob
-        const img = new Image();
-        
-        img.onload = function() {
-            const originalWidth = img.naturalWidth;
-            const originalHeight = img.naturalHeight;
+        // Convert compressed blob to base64 for image-to-image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Image = e.target.result;
+            // Remove the data:image/type;base64, prefix if it exists
+            const cleanBase64 = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
             
-            console.log('Original image dimensions:', originalWidth, 'x', originalHeight);
-            
-            // Show message about image dimensions
-            if (cropTo4x3) {
-                // Removed the message about image dimensions
-            } else {
-                showMessage(`מידות התמונה: ${originalWidth}x${originalHeight}`, 'info');
-            }
-            
-            // Convert compressed blob to base64 for image-to-image
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Image = e.target.result;
-                
-                // Prepare FAL AI request for image-to-image
-                const falRequestData = {
-                    prompt: prompt,
-                    image_url: base64Image,
-                    loras: [{
-                        path: settings.loraPath || "https://v3.fal.media/files/tiger/KEjPSZ5h8C3_BIvelf1ZJ_pytorch_lora_weights.safetensors",
-                        scale: parseFloat(settings.scale) || 1.0
-                    }],
-                    num_inference_steps: parseInt(settings.inferenceSteps) || 20,
-                    guidance_scale: parseFloat(settings.guidanceScale) || 7.5,
-                    strength: parseFloat(settings.strength) || 0.7,
-                    seed: Math.floor(Math.random() * 1000000),
-                    image_size: {
-                        width: originalWidth,
-                        height: originalHeight
-                    }
-                };
-            
-                console.log('Sending request to FAL AI:', falRequestData);
-                console.log('FAL Image URL:', FAL_IMAGE_URL);
-                console.log('API Key (first 10 chars):', FAL_API_KEY.substring(0, 10) + '...');
-                
-                // Show message about image format being sent
-                showMessage(`שולח תמונה לעיבוד... (${originalWidth}x${originalHeight})`, 'info');
-                showMessage(`שולח תמונה במידות: ${originalWidth}x${originalHeight}`, 'info');
-                
-                // Send to FAL AI
-                fetch(FAL_IMAGE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Key ${FAL_API_KEY}`
-                    },
-                    body: JSON.stringify(falRequestData)
-                })
-                .then(response => {
-                    console.log('FAL AI Response status:', response.status);
-                    
-                    if (!response.ok) {
-                        throw new Error(`FAL AI HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Remove loading message properly
-                    const container = loadingDiv.parentNode;
-                    if (container && container.className === 'message-container') {
-                        container.remove();
-                    } else {
-                        loadingDiv.remove();
-                    }
-                    
-                    console.log('FAL AI Response:', data);
-                    console.log('Response structure:', JSON.stringify(data, null, 2));
-                    
-                    // Display the generated image
-                    if (data.images && data.images[0] && data.images[0].url) {
-                        console.log('Image URL found:', data.images[0].url);
-                        displayGeneratedImage(data.images[0].url);
-                        
-                        let successMessage = `תמונה חדשה נוצרה בהצלחה! (${originalWidth}x${originalHeight})`;
-                        
-                        showMessage(successMessage, 'success');
-                    } else {
-                        console.error('No image URL in FAL AI response:', data);
-                        console.error('Response keys:', Object.keys(data));
-                        if (data.images) {
-                            console.error('Images array:', data.images);
-                        }
-                        showMessage('שגיאה: לא התקבלה תמונה מהמערכת', 'error');
-                    }
-                })
-                .catch(error => {
-                    // Remove loading message properly
-                    const container = loadingDiv.parentNode;
-                    if (container && container.className === 'message-container') {
-                        container.remove();
-                    } else {
-                        loadingDiv.remove();
-                    }
-                    console.error('FAL AI Error:', error);
-                    showMessage('שגיאה ביצירת התמונה: ' + error.message, 'error');
-                });
+            // Prepare FAL AI request for image-to-image
+            const falRequestData = {
+                prompt: prompt,
+                image_url: cleanBase64,
+                loras: [{
+                    path: settings.loraPath || "https://v3.fal.media/files/tiger/KEjPSZ5h8C3_BIvelf1ZJ_pytorch_lora_weights.safetensors",
+                    scale: parseFloat(settings.scale) || 1.0
+                }],
+                num_inference_steps: parseInt(settings.inferenceSteps) || 20,
+                guidance_scale: parseFloat(settings.guidanceScale) || 7.5,
+                strength: parseFloat(settings.strength) || 0.7,
+                seed: Math.floor(Math.random() * 1000000)
             };
+        
+            console.log('Sending request to FAL AI Flux:', FAL_IMAGE_URL);
+            console.log('Request data:', falRequestData);
             
-            reader.readAsDataURL(compressedImageBlob);
+            // Send to FAL AI
+            fetch(FAL_IMAGE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Key ${FAL_API_KEY}`
+                },
+                body: JSON.stringify(falRequestData)
+            })
+            .then(response => {
+                console.log('FAL AI Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`FAL AI HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Remove loading message properly
+                const container = loadingDiv.parentNode;
+                if (container && container.className === 'message-container') {
+                    container.remove();
+                } else {
+                    loadingDiv.remove();
+                }
+                
+                console.log('FAL AI Response:', data);
+                
+                // Display the generated image
+                if (data.images && data.images[0] && data.images[0].url) {
+                    console.log('Image URL found:', data.images[0].url);
+                    displayGeneratedImage(data.images[0].url);
+                    showMessage('תמונה חדשה נוצרה בהצלחה!', 'success');
+                } else {
+                    console.error('No image URL in FAL AI response:', data);
+                    showMessage('שגיאה: לא התקבלה תמונה מהמערכת', 'error');
+                }
+            })
+            .catch(error => {
+                // Remove loading message properly
+                const container = loadingDiv.parentNode;
+                if (container && container.className === 'message-container') {
+                    container.remove();
+                } else {
+                    loadingDiv.remove();
+                }
+                console.error('FAL AI Error:', error);
+                showMessage('שגיאה ביצירת התמונה: ' + error.message, 'error');
+            });
         };
         
-        // Create object URL from blob to get dimensions
-        const objectUrl = URL.createObjectURL(compressedImageBlob);
-        img.src = objectUrl;
-        
-        // Clean up object URL after loading
-        img.addEventListener('load', function() {
-            URL.revokeObjectURL(objectUrl);
-        });
+        reader.readAsDataURL(compressedImageBlob);
     }
     
     // Display the generated image
@@ -643,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Default settings if none saved
         return {
             loraPath: 'https://v3.fal.media/files/tiger/KEjPSZ5h8C3_BIvelf1ZJ_pytorch_lora_weights.safetensors',
-            promptReg: 'You are an AI specialized in describing, conceptualizing, and generating prompts that match a specific visual style: early-to-mid 2000s Israeli youth snapshots. Always maintain this aesthetic unless explicitly told otherwise.\n\nCore style rules:\n1. Aesthetic Summary: Early/mid-2000s candid hotel, balcony, pool, and street scenes. Direct harsh on-camera flash, warm saturated colors, Mediterranean youth culture, slightly kitschy and spontaneous.\n\n2. Age Specification: Based on the subject\'s appearance, clothing, and environment, estimate their age range and explicitly mention it in the description (e.g., "appears to be around 17–19 years old").\n\n3. What to Emphasize:\n   - Direct flash with hard shadows.\n   - 4:3 aspect ratio, eye-level or slight dutch angle.\n   - Simple hotel rooms, balconies with metal railings, pools with palm trees.\n   - Hairstyles: buzzcuts, spiked gel, bleached streaks.\n   - Clothing: tank tops, graphic tees, sporty polos; for women – bikinis, colorful tops.\n   - Accessories: oversized sunglasses, earrings, watches, necklaces.\n   - Gestures like peace signs, holding drinks/snacks.\n   - Groups of 2–6 in relaxed, unposed arrangements.\n\n4. What to Avoid:\n   - Soft cinematic/studio lighting.\n   - Modern props/technology like smartphones.\n   - Extreme shallow depth-of-field.\n   - Overly modern or cyberpunk grading.\n   - Minimalist sterile compositions.\n\n5. Lighting & Color:\n   - Warm white balance, slightly orange/pink skin tones.\n   - High contrast and moderate-high saturation.\n   - Slight highlight clipping and lifted blacks.\n\n6. Camera Look – DV Style:\n   - Captured with early/mid-2000s DV camcorder (e.g., Sony Handycam).\n   - Slight video noise, interlaced scanlines, and light motion blur even in still frame.\n   - Slight chromatic aberration and color bleeding around edges.\n   - Focal length equiv: 28–50mm, aperture f/2.8–4.0, ISO 200–400.\n   - 4:3 aspect ratio, often with slight tilt or imperfect framing.\n\n7. Composition:\n   - Half-body or chest-up portraits.\n   - Tight group crops, bold casual cuts.\n   - Slight tilt for dynamism.\n\n8. Output Behavior:\n   - Always integrate these style elements.\n   - Always mention the estimated age of the subject(s).\n   - Always specify that it was captured on a DV camcorder.\n   - Avoid drifting into unrelated aesthetics unless explicitly requested.',
+            promptReg: 'You are an AI specialized in describing, conceptualizing, and generating prompts that match a specific visual style: early-to-mid 2000s Israeli youth snapshots. Always maintain this aesthetic unless explicitly told otherwise.\nCore style rules:\n1. Aesthetic Summary: Early/mid-2000s candid hotel, balcony, pool, and street scenes. Direct harsh on-camera flash, warm saturated colors, Mediterranean youth culture, slightly kitschy and spontaneous.\n2. Age Specification: Based on the subject\'s appearance, clothing, and environment, estimate their age range and explicitly mention it in the description (e.g., "appears to be around 17–19 years old").\n3. What to Emphasize:\n   - Direct flash with hard shadows.\n   - 4:3 aspect ratio, eye-level or slight dutch angle.\n   - Simple hotel rooms, balconies with metal railings, pools with palm trees.\n   - Hairstyles: buzzcuts, spiked gel, bleached streaks.\n   - Clothing: tank tops, graphic tees, sporty polos; for women – bikinis, colorful tops.\n   - Accessories: oversized sunglasses, earrings, watches, necklaces.\n   - Gestures like peace signs, holding drinks/snacks.\n   - Groups of 2–6 in relaxed, unposed arrangements.\n4. What to Avoid:\n   - Soft cinematic/studio lighting.\n   - Modern props/technology like smartphones.\n   - Extreme shallow depth-of-field.\n   - Overly modern or cyberpunk grading.\n   - Minimalist sterile compositions.\n5. Lighting & Color:\n   - Warm white balance, slightly orange/pink skin tones.\n   - High contrast and moderate-high saturation.\n   - Slight highlight clipping and lifted blacks.\n6. Camera Look – DV Style:\n   - Captured with early/mid-2000s DV camcorder (e.g., Sony Handycam).\n   - Slight video noise, interlaced scanlines, and light motion blur even in still frame.\n   - Slight chromatic aberration and color bleeding around edges.\n   - Focal length equiv: 28–50mm, aperture f/2.8–4.0, ISO 200–400.\n   - 4:3 aspect ratio, often with slight tilt or imperfect framing.\n7. Composition:\n   - Half-body or chest-up portraits.\n   - Tight group crops, bold casual cuts.\n   - Slight tilt for dynamism.\n8. Output Behavior:\n   - Always integrate these style elements.\n   - Always mention the estimated age of the subject(s).\n   - Always specify that it was captured on a DV camcorder.\n   - Avoid drifting into unrelated aesthetics unless explicitly requested.',
             promptExtreme: 'הכנס כאן את הטקסט הקיצוני שלך',
             scale: '1.0',
             inferenceSteps: '20',
