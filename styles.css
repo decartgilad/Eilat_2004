@@ -1,0 +1,359 @@
+/* =================================================
+   Eilat 2004 - Optimized Design System
+   ================================================= */
+
+/* Font Definition */
+@font-face {
+    font-family: 'SHIMARG';
+    src: url('Assets/SHIMARG_.TTF') format('truetype');
+}
+
+/* =========================================
+   CSS Variables - Complete Design System
+   ========================================= */
+:root {
+    /* Colors */
+    --primary: #048ABF;
+    --success: #048ABF;
+    --warning: #F29422;
+    --accent: #F2AB27;
+    --danger: #F23322;
+    --white: #FFFFFF;
+    --black: #000000;
+    --gray: #666666;
+    
+    /* Spacing Scale */
+    --s1: 5px;
+    --s2: 10px;
+    --s3: 15px;
+    --s4: 20px;
+    --s5: 30px;
+    
+    /* Typography */
+    --font: 'SHIMARG', Arial, sans-serif;
+    --text-sm: 12px;
+    --text-md: 20px;
+    --text-lg: 17px;
+    --text-xl: 16px;
+    --text-2xl: 18px;
+    
+    /* Layout */
+    --border: 1px solid var(--primary);
+    --border-inset: 2px inset var(--primary);
+    --border-outset: 2px outset var(--primary);
+    --radius: 0;
+}
+
+/* =========================================
+   Base Styles - Global Reset & Defaults
+   ========================================= */
+* {
+    font-family: 'SHIMARG', Arial, sans-serif !important;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--white);
+    color: var(--black);
+    margin: 0;
+    padding: var(--s4);
+    font-size: 100%;
+    line-height: 1.4;
+    font-family: 'SHIMARG', Arial, sans-serif !important;
+}
+
+/* =========================================
+   Typography - Smart Hierarchy
+   ========================================= */
+h1, h2, h3, h4, h5, h6 {
+    margin: var(--s3) 0;
+    font-weight: bold;
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { 
+    font-size: var(--text-xl); 
+    background: var(--primary);
+    color: var(--white);
+    padding: var(--s2);
+}
+h3 { font-size: var(--text-lg); }
+
+p {
+    margin: var(--s2) 0;
+    font-size: var(--text-md);
+}
+
+/* Utility classes */
+.text-sm { font-size: var(--text-sm) !important; }
+.text-lg { font-size: var(--text-lg) !important; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+
+/* =========================================
+   Links & Navigation
+   ========================================= */
+a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+a:visited { color: var(--success); }
+a:hover { color: var(--warning); }
+
+/* =========================================
+   Layout - Tables & Structure
+   ========================================= */
+table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    width: 100%;
+}
+
+td, th {
+    padding: var(--s1);
+    vertical-align: middle;
+}
+
+table[border="1"], 
+.admin-panel,
+.settings-section {
+    border: var(--border);
+}
+
+/* Main frame without border */
+.main-frame {
+    border: none;
+}
+
+/* Frame padding */
+.main-frame td,
+.welcome-box td,
+.content-frame td,
+.admin-panel td,
+.settings-section td {
+    padding: var(--s4) !important;
+}
+
+/* =========================================
+   Forms - Unified Input System
+   ========================================= */
+input, textarea, select, button {
+    font-family: var(--font);
+    padding: var(--s1);
+    border: var(--border-inset);
+    background: var(--white);
+    color: var(--black);
+    margin: var(--s1);
+}
+
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+textarea {
+    width: 100%;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin: var(--s2) 0 var(--s1) 0;
+}
+
+fieldset {
+    border: var(--border);
+    padding: var(--s3);
+    margin: var(--s3) auto;
+    background: var(--white);
+}
+
+legend {
+    font-weight: bold;
+    padding: 0 var(--s2);
+}
+
+/* =========================================
+   Buttons - Smart Color System
+   ========================================= */
+button, .btn, .upload-button {
+    background: var(--accent);
+    border: var(--border-outset);
+    padding: var(--s2) var(--s3);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover, .btn:hover, .upload-button:hover {
+    background: var(--warning);
+}
+
+button:active, .btn:active, .upload-button:active {
+    border: var(--border-inset);
+}
+
+/* Button variants */
+.btn.primary { background: var(--primary); color: var(--white); }
+.btn.success { background: var(--success); color: var(--white); }
+.btn.danger { background: var(--danger); color: var(--white); }
+
+/* =========================================
+   Messages - Clean & Simple
+   ========================================= */
+.success-message, .error-message {
+    margin: var(--s2) auto;
+    padding: var(--s1);
+    font-weight: bold;
+    background: none;
+    border: none;
+}
+
+.success-message { color: var(--success); }
+.error-message { color: var(--danger); }
+
+/* Loading state */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--primary) !important; /* Blue color for loading messages */
+}
+
+/* =========================================
+   Components - Specific Elements
+   ========================================= */
+
+/* Welcome box override for white text */
+.welcome-box font {
+    color: var(--white) !important;
+}
+
+/* Welcome box table - no padding */
+.welcome-box table {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.welcome-box td {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+    transform: scale(1.2);
+    margin: 0 var(--s1);
+}
+
+/* Logo styling */
+img[alt*="לוגו"] {
+    border: none;
+    background: none;
+}
+
+/* Image styling - preserve aspect ratio */
+img {
+    object-fit: contain;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Specific styling for ShimiShula gif */
+img[src*="ShimiShula"] {
+    width: 150px !important;
+    height: 150px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Specific styling for Katrina gif */
+img[src*="katrina"] {
+    width: 150px !important;
+    height: 150px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Upload area */
+.upload-area {
+    border: var(--border);
+    padding: var(--s5);
+    background: #F0F0F0;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    background: #E0E0E0;
+}
+
+/* Navigation */
+.nav-link {
+    margin: 0 var(--s1);
+}
+
+/* =========================================
+   Responsive & Utility
+   ========================================= */
+
+/* Center containers */
+center {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Hide elements */
+.hidden {
+    display: none !important;
+}
+
+/* Spacing utilities */
+.m-0 { margin: 0 !important; }
+.p-0 { padding: 0 !important; }
+.mt-2 { margin-top: var(--s2) !important; }
+.mb-2 { margin-bottom: var(--s2) !important; }
+.pt-2 { padding-top: var(--s2) !important; }
+.pb-2 { padding-bottom: var(--s2) !important; }
+
+/* Color utilities */
+.text-primary { color: var(--primary) !important; }
+.text-success { color: var(--success) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-danger { color: var(--danger) !important; }
+.bg-primary { background: var(--primary) !important; }
+.bg-success { background: var(--success) !important; }
+.bg-warning { background: var(--warning) !important; }
+.bg-accent { background: var(--accent) !important; }
+
+/* =========================================
+   Legacy Support - Minimal 2004 Elements
+   ========================================= */
+font[face], font {
+    font-family: 'SHIMARG', Arial, sans-serif !important;
+}
+
+font[size="1"] { font-size: 10px; }
+font[size="2"] { font-size: 14px; }
+font[size="3"] { font-size: 24px; }
+font[size="4"] { font-size: 16px; }
+font[size="5"] { font-size: 18px; }
+
+/* Table borders */
+table[bgcolor] td {
+    background: inherit;
+}
+
+/* Final cleanup */
+ul, ol {
+    padding: 0;
+    list-style-position: inside;
+    margin: var(--s2) auto;
+}
+
+li {
+    margin: var(--s1) 0;
+}

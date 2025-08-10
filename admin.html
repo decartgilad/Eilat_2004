@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול מערכת - אילת 2004</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="shared-components.js"></script>
+</head>
+<body>
+    <center>
+    <table width="800" border="0" cellpadding="10" cellspacing="0" bgcolor="#FFFFFF" class="main-frame">
+        <tr>
+            <td>
+                <!-- Shared Header Component -->
+                <div id="shared-header"></div>
+                
+                <!-- Admin Section Title -->
+                <table width="100%" border="0" cellpadding="10" cellspacing="0" bgcolor="#FFFFFF">
+                    <tr>
+                        <td align="center">
+                            <font face="SHIMARG, Arial" size="3" color="#000000">
+                                <b>ניהול מערכת</b>
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Main Content -->
+                <table width="100%" border="1" cellpadding="20" cellspacing="0" bgcolor="#FFFFFF">
+                    <tr>
+                        <td align="center">
+                            <!-- Admin Panel -->
+                            <table width="100%" border="1" cellpadding="10" cellspacing="0" bgcolor="#FFFFFF" class="admin-panel">
+                                <tr>
+                                    <td bgcolor="#F2AB27">
+                                        <h2>ניהול מערכת</h2>
+                                        <p class="large">ברוכים הבאים לפאנל הניהול של אתר אילת 2004</p>
+                                        <p><strong>סטטוס מערכת:</strong> <span style="color: #118C3C;">פעיל</span></p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <br>
+
+                            <!-- Settings Section -->
+                            <table width="100%" border="1" cellpadding="15" cellspacing="0" bgcolor="#FFFFFF" class="settings-section">
+                                <tr>
+                                    <td align="center">
+                                        <h3>הגדרות מערכת</h3>
+                                        <fieldset>
+                                            <legend>הגדרות AI ו-LoRA</legend>
+                                            
+                                            <label for="loraPath">נתיב LoRA:</label>
+                                            <input type="text" id="loraPath" value="https://v3.fal.media/files/tiger/KEjPSZ5h8C3_BIvelf1ZJ_pytorch_lora_weights.safetensors" style="width: 90%;">
+                                            
+                                            <br><br>
+                                            
+                                            <table width="100%" border="0" cellpadding="5" cellspacing="0">
+                                                <tr>
+                                                    <td width="25%">
+                                                        <label for="scale">סקייל:</label>
+                                                        <input type="number" id="scale" value="1.0" step="0.1" min="0" max="2">
+                                                    </td>
+                                                    <td width="25%">
+                                                        <label for="inferenceSteps">צעדי מסקנה:</label>
+                                                        <input type="number" id="inferenceSteps" value="20" min="1" max="100">
+                                                    </td>
+                                                    <td width="25%">
+                                                        <label for="guidanceScale">מדריך סקייל:</label>
+                                                        <input type="number" id="guidanceScale" value="7.5" step="0.1" min="0" max="20">
+                                                    </td>
+                                                    <td width="25%">
+                                                        <label for="strength">עוצמה:</label>
+                                                        <input type="number" id="strength" value="0.7" step="0.1" min="0" max="1">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </fieldset>
+                                        
+                                        <!-- Image Compression Section -->
+                                        <fieldset>
+                                            <legend>הגדרות דחיסת תמונה</legend>
+                                            
+                                            <table width="100%" cellpadding="5">
+                                                <tr>
+                                                    <td width="33%">
+                                                        <label for="compressionQuality">איכות דחיסה:</label>
+                                                        <input type="number" id="compressionQuality" value="0.75" step="0.05" min="0.1" max="1.0">
+                                                    </td>
+                                                    <td width="33%">
+                                                        <label for="maxWidth">רוחב מקסימלי:</label>
+                                                        <input type="number" id="maxWidth" value="1920" step="100" min="500" max="4000">
+                                                    </td>
+                                                    <td width="34%">
+                                                        <label for="maxHeight">גובה מקסימלי:</label>
+                                                        <input type="number" id="maxHeight" value="1080" step="100" min="500" max="4000">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3">
+                                                        <label for="cropTo4x3" style="display: flex; align-items: center; gap: 8px;">
+                                                            <input type="checkbox" id="cropTo4x3" checked>
+                                                            <span>קרופ תמונה ליחס 4:3 לפני שליחה למודל</span>
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </fieldset>
+                                        
+                                        <fieldset>
+                                            <legend>פרומפטים</legend>
+                                            
+                                            <label for="promptReg">פרומפט רגיל:</label>
+                                            <textarea id="promptReg" rows="8" style="width: 95%; height: 150px; resize: vertical;">You are an AI specialized in describing, conceptualizing, and generating prompts that match a specific visual style: early-to-mid 2000s Israeli youth snapshots. Always maintain this aesthetic unless explicitly told otherwise.
+
+Core style rules:
+1. Aesthetic Summary: Early/mid-2000s candid hotel, balcony, pool, and street scenes. Direct harsh on-camera flash, warm saturated colors, Mediterranean youth culture, slightly kitschy and spontaneous.
+
+2. Age Specification: Based on the subject's appearance, clothing, and environment, estimate their age range and explicitly mention it in the description (e.g., "appears to be around 17–19 years old").
+
+3. What to Emphasize:
+   - Direct flash with hard shadows.
+   - 4:3 aspect ratio, eye-level or slight dutch angle.
+   - Simple hotel rooms, balconies with metal railings, pools with palm trees.
+   - Hairstyles: buzzcuts, spiked gel, bleached streaks.
+   - Clothing: tank tops, graphic tees, sporty polos; for women – bikinis, colorful tops.
+   - Accessories: oversized sunglasses, earrings, watches, necklaces.
+   - Gestures like peace signs, holding drinks/snacks.
+   - Groups of 2–6 in relaxed, unposed arrangements.
+
+4. What to Avoid:
+   - Soft cinematic/studio lighting.
+   - Modern props/technology like smartphones.
+   - Extreme shallow depth-of-field.
+   - Overly modern or cyberpunk grading.
+   - Minimalist sterile compositions.
+
+5. Lighting & Color:
+   - Warm white balance, slightly orange/pink skin tones.
+   - High contrast and moderate-high saturation.
+   - Slight highlight clipping and lifted blacks.
+
+6. Camera Look – DV Style:
+   - Captured with early/mid-2000s DV camcorder (e.g., Sony Handycam).
+   - Slight video noise, interlaced scanlines, and light motion blur even in still frame.
+   - Slight chromatic aberration and color bleeding around edges.
+   - Focal length equiv: 28–50mm, aperture f/2.8–4.0, ISO 200–400.
+   - 4:3 aspect ratio, often with slight tilt or imperfect framing.
+
+7. Composition:
+   - Half-body or chest-up portraits.
+   - Tight group crops, bold casual cuts.
+   - Slight tilt for dynamism.
+
+8. Output Behavior:
+   - Always integrate these style elements.
+   - Always mention the estimated age of the subject(s).
+   - Always specify that it was captured on a DV camcorder.
+   - Avoid drifting into unrelated aesthetics unless explicitly requested.</textarea>
+                                            
+                                            <br><br>
+                                            
+                                            <label for="promptExtreme">פרומפט אקסטרים:</label>
+                                            <textarea id="promptExtreme" rows="4" style="width: 95%; height: 80px; resize: vertical;">הכנס כאן את הטקסט הקיצוני שלך</textarea>
+                                        </fieldset>
+                                        
+                                        <div style="text-align: center; margin-top: 20px;">
+                                            <button type="button" class="btn success" onclick="saveSettings()">שמור הגדרות</button>
+                                            <button type="button" class="btn danger" onclick="resetSettings()">איפוס הגדרות</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <br>
+
+                            <!-- Shared Footer Component -->
+                            <div id="shared-footer"></div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    </center>
+    
+    <script>
+        // Default settings
+        const defaultSettings = {
+            loraPath: 'https://v3.fal.media/files/tiger/KEjPSZ5h8C3_BIvelf1ZJ_pytorch_lora_weights.safetensors',
+            promptReg: 'You are an AI specialized in describing, conceptualizing, and generating prompts that match a specific visual style: early-to-mid 2000s Israeli youth snapshots. Always maintain this aesthetic unless explicitly told otherwise.\n\nCore style rules:\n1. Aesthetic Summary: Early/mid-2000s candid hotel, balcony, pool, and street scenes. Direct harsh on-camera flash, warm saturated colors, Mediterranean youth culture, slightly kitschy and spontaneous.\n\n2. Age Specification: Based on the subject\'s appearance, clothing, and environment, estimate their age range and explicitly mention it in the description (e.g., "appears to be around 17–19 years old").\n\n3. What to Emphasize:\n   - Direct flash with hard shadows.\n   - 4:3 aspect ratio, eye-level or slight dutch angle.\n   - Simple hotel rooms, balconies with metal railings, pools with palm trees.\n   - Hairstyles: buzzcuts, spiked gel, bleached streaks.\n   - Clothing: tank tops, graphic tees, sporty polos; for women – bikinis, colorful tops.\n   - Accessories: oversized sunglasses, earrings, watches, necklaces.\n   - Gestures like peace signs, holding drinks/snacks.\n   - Groups of 2–6 in relaxed, unposed arrangements.\n\n4. What to Avoid:\n   - Soft cinematic/studio lighting.\n   - Modern props/technology like smartphones.\n   - Extreme shallow depth-of-field.\n   - Overly modern or cyberpunk grading.\n   - Minimalist sterile compositions.\n\n5. Lighting & Color:\n   - Warm white balance, slightly orange/pink skin tones.\n   - High contrast and moderate-high saturation.\n   - Slight highlight clipping and lifted blacks.\n\n6. Camera Look – DV Style:\n   - Captured with early/mid-2000s DV camcorder (e.g., Sony Handycam).\n   - Slight video noise, interlaced scanlines, and light motion blur even in still frame.\n   - Slight chromatic aberration and color bleeding around edges.\n   - Focal length equiv: 28–50mm, aperture f/2.8–4.0, ISO 200–400.\n   - 4:3 aspect ratio, often with slight tilt or imperfect framing.\n\n7. Composition:\n   - Half-body or chest-up portraits.\n   - Tight group crops, bold casual cuts.\n   - Slight tilt for dynamism.\n\n8. Output Behavior:\n   - Always integrate these style elements.\n   - Always mention the estimated age of the subject(s).\n   - Always specify that it was captured on a DV camcorder.\n   - Avoid drifting into unrelated aesthetics unless explicitly requested.',
+            promptExtreme: 'הכנס כאן את הטקסט הקיצוני שלך',
+            scale: '1.0',
+            inferenceSteps: '20',
+            guidanceScale: '7.5',
+            strength: '0.7',
+            compressionQuality: '0.75',
+            maxWidth: '1920',
+            maxHeight: '1080',
+            cropTo4x3: true
+        };
+
+        // Load settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+        });
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('eilat2004_settings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                document.getElementById('loraPath').value = settings.loraPath || defaultSettings.loraPath;
+                document.getElementById('promptReg').value = settings.promptReg || defaultSettings.promptReg;
+                document.getElementById('promptExtreme').value = settings.promptExtreme || defaultSettings.promptExtreme;
+                document.getElementById('scale').value = settings.scale || defaultSettings.scale;
+                document.getElementById('inferenceSteps').value = settings.inferenceSteps || defaultSettings.inferenceSteps;
+                document.getElementById('guidanceScale').value = settings.guidanceScale || defaultSettings.guidanceScale;
+                document.getElementById('strength').value = settings.strength || defaultSettings.strength;
+                document.getElementById('compressionQuality').value = settings.compressionQuality || defaultSettings.compressionQuality;
+                document.getElementById('maxWidth').value = settings.maxWidth || defaultSettings.maxWidth;
+                document.getElementById('maxHeight').value = settings.maxHeight || defaultSettings.maxHeight;
+                document.getElementById('cropTo4x3').checked = settings.cropTo4x3 || defaultSettings.cropTo4x3;
+            } else {
+                // Use default settings if none saved
+                document.getElementById('loraPath').value = defaultSettings.loraPath;
+                document.getElementById('promptReg').value = defaultSettings.promptReg;
+                document.getElementById('promptExtreme').value = defaultSettings.promptExtreme;
+                document.getElementById('scale').value = defaultSettings.scale;
+                document.getElementById('inferenceSteps').value = defaultSettings.inferenceSteps;
+                document.getElementById('guidanceScale').value = defaultSettings.guidanceScale;
+                document.getElementById('strength').value = defaultSettings.strength;
+                document.getElementById('compressionQuality').value = defaultSettings.compressionQuality;
+                document.getElementById('maxWidth').value = defaultSettings.maxWidth;
+                document.getElementById('maxHeight').value = defaultSettings.maxHeight;
+                document.getElementById('cropTo4x3').checked = defaultSettings.cropTo4x3;
+            }
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            const settings = {
+                loraPath: document.getElementById('loraPath').value,
+                promptReg: document.getElementById('promptReg').value,
+                promptExtreme: document.getElementById('promptExtreme').value,
+                scale: document.getElementById('scale').value,
+                inferenceSteps: document.getElementById('inferenceSteps').value,
+                guidanceScale: document.getElementById('guidanceScale').value,
+                strength: document.getElementById('strength').value,
+                compressionQuality: document.getElementById('compressionQuality').value,
+                maxWidth: document.getElementById('maxWidth').value,
+                maxHeight: document.getElementById('maxHeight').value,
+                cropTo4x3: document.getElementById('cropTo4x3').checked,
+                lastUpdated: new Date().toISOString()
+            };
+
+            // Save to localStorage
+            localStorage.setItem('eilat2004_settings', JSON.stringify(settings));
+
+            // TODO: Future DB integration
+            // saveToDatabase(settings);
+
+            alert('הגדרות נשמרו בהצלחה!');
+        }
+
+        // Reset settings to defaults
+        function resetSettings() {
+            if (confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+                // Clear localStorage
+                localStorage.removeItem('eilat2004_settings');
+                
+                // Reset to defaults
+                document.getElementById('loraPath').value = defaultSettings.loraPath;
+                document.getElementById('promptReg').value = defaultSettings.promptReg;
+                document.getElementById('promptExtreme').value = defaultSettings.promptExtreme;
+                document.getElementById('scale').value = defaultSettings.scale;
+                document.getElementById('inferenceSteps').value = defaultSettings.inferenceSteps;
+                document.getElementById('guidanceScale').value = defaultSettings.guidanceScale;
+                document.getElementById('strength').value = defaultSettings.strength;
+                document.getElementById('compressionQuality').value = defaultSettings.compressionQuality;
+                document.getElementById('maxWidth').value = defaultSettings.maxWidth;
+                document.getElementById('maxHeight').value = defaultSettings.maxHeight;
+                document.getElementById('cropTo4x3').checked = defaultSettings.cropTo4x3;
+
+                alert('הגדרות אופסו!');
+            }
+        }
+
+        // Future DB integration function
+        function saveToDatabase(settings) {
+            // TODO: Implement database save
+            // Example:
+            // fetch('/api/settings', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(settings)
+            // });
+            console.log('Saving to database:', settings);
+        }
+
+        // Get current settings (for use in other parts of the app)
+        function getCurrentSettings() {
+            const savedSettings = localStorage.getItem('eilat2004_settings');
+            return savedSettings ? JSON.parse(savedSettings) : defaultSettings;
+        }
+    </script>
+</body>
+</html>
