@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastCompressedImage = null; // Store the last compressed image for "try again" functionality
     
     // Image compression function using Web Worker
-    function compressImage(file, maxWidth = 1024, maxHeight = 1024, quality = 0.75, cropTo4x3 = true) {
+    function compressImage(file, maxWidth = 1024, maxHeight = 1024, quality = 0.75) {
         return new Promise((resolve, reject) => {
             console.log('Starting image compression...');
             
@@ -43,8 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 imageData: file,
                 maxWidth: maxWidth,
                 maxHeight: maxHeight,
-                quality: quality,
-                cropTo4x3: cropTo4x3
+                quality: quality
             });
         });
     }
@@ -58,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const FAL_IMAGE_URL = 'https://fal.run/fal-ai/flux-lora/image-to-image';
     
     // Classic 2004 loading message with animated GIF
-    function showLoadingMessage(message = 'מעבד תמונה... אנא המתן...') {
+    function showLoadingMessage(message = 'מעבד תמונה... חכה רגע...') {
         // Remove any existing loading messages first
         const existingLoading = document.querySelectorAll('.loading');
         existingLoading.forEach(loading => {
@@ -216,12 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading immediately with GIF
             const settings = getCurrentSettings();
-            const cropTo4x3 = settings.cropTo4x3 === 'true' || settings.cropTo4x3 === true;
-            
-            let loadingMessage = 'מתחיל לנתח את התמונה...';
-            if (cropTo4x3) {
-                loadingMessage = 'מתחיל לנתח את התמונה... (התמונה תיחתך ליחס 4:3)';
-            }
+            let loadingMessage = 'מתחיל לנתח את התמונה... (התמונה תיחתך ליחס 4:3)';
             
             showLoadingMessage(loadingMessage);
             
@@ -265,18 +259,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const maxWidth = parseInt(settings.maxWidth) || 1024;
                 const maxHeight = parseInt(settings.maxHeight) || 1024;
                 const quality = parseFloat(settings.compressionQuality) || 0.75;
-                const cropTo4x3 = settings.cropTo4x3 === 'true'; // Convert string to boolean
-                const compressedBlob = await compressImage(file, maxWidth, maxHeight, quality, cropTo4x3);
+        
+                const compressedBlob = await compressImage(file, maxWidth, maxHeight, quality);
                 
                 // Store compressed image for "try again" functionality
                 lastCompressedImage = compressedBlob;
                 
-                // Show compression success message
-                if (cropTo4x3) {
-                    showMessage('התמונה נדחסה ונחתכה בהצלחה ליחס 4:3!', 'success');
-                } else {
-                    showMessage('התמונה נדחסה בהצלחה!', 'success');
-                }
+                            // Show compression success message
+            showMessage('התמונה נדחסה ונחתכה בהצלחה ליחס 4:3!', 'success');
                 
                 // Update loading message
                 const container = loadingDiv.parentNode;
@@ -285,11 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Show appropriate message based on cropping setting
-                if (cropTo4x3) {
-                    showLoadingMessage('מנתח את התמונה... (התמונה נחתכה ליחס 4:3)');
-                } else {
-                    showLoadingMessage('מנתח את התמונה...');
-                }
+                showLoadingMessage('מנתח את התמונה... (התמונה נחתכה ליחס 4:3)');
                 
                 // Convert compressed blob to base64
                 const reader = new FileReader();
@@ -364,20 +350,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Prompt generated successfully (display elements removed from UI)
                         console.log('Prompt generated successfully:', generatedPrompt);
                         
-                        let successMessage = 'פרומפט נוצר בהצלחה! עכשיו יוצר תמונה חדשה...';
-                        if (cropTo4x3) {
-                            successMessage = 'פרומפט נוצר בהצלחה! התמונה נחתכה ליחס 4:3. עכשיו יוצר תמונה חדשה...';
-                        }
+                                        let successMessage = 'פרומפט נוצר בהצלחה! עכשיו מייצר תמונה חדשה...';
                         
                         showMessage(successMessage, 'success');
                         
                         // Auto-send to FAL AI for image generation with compressed image
                         setTimeout(() => {
-                            if (cropTo4x3) {
-                                showMessage('התמונה נחתכה בהצלחה ליחס 4:3! שולח למודל Flux...', 'success');
-                            } else {
-                                showMessage('שולח תמונה למודל Flux...', 'success');
-                            }
+                            showMessage('שולח תמונה לעיבוד...', 'success');
                             generateImageWithFAL(generatedPrompt, compressedBlob);
                         }, 1500);
                         
@@ -419,12 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('generateImageWithFAL called with prompt:', prompt);
         
         const settings = getCurrentSettings();
-        const cropTo4x3 = settings.cropTo4x3 === 'true' || settings.cropTo4x3 === true;
         
-        let loadingMessage = 'יוצר תמונה חדשה... אנא המתן...';
-        if (cropTo4x3) {
-            loadingMessage = 'יוצר תמונה חדשה... (התמונה נשלחת ביחס 4:3)';
-        }
+        let loadingMessage = 'יוצר תמונה חדשה... חכה רגע...';
         
         const loadingDiv = showLoadingMessage(loadingMessage);
         
@@ -439,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show message about image dimensions
             if (cropTo4x3) {
-                showMessage(`התמונה נחתכה ליחס 4:3! מידות: ${originalWidth}x${originalHeight}`, 'info');
+                // Removed the message about image dimensions
             } else {
                 showMessage(`מידות התמונה: ${originalWidth}x${originalHeight}`, 'info');
             }
@@ -472,14 +447,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('API Key (first 10 chars):', FAL_API_KEY.substring(0, 10) + '...');
                 
                 // Show message about image format being sent
-                if (cropTo4x3) {
-                    showMessage(`שולח תמונה ביחס 4:3 למודל Flux... (${originalWidth}x${originalHeight})`, 'info');
-                } else {
-                    showMessage(`שולח תמונה למודל Flux... (${originalWidth}x${originalHeight})`, 'info');
-                }
-                
-                // Show message about image dimensions being sent to Flux
-                showMessage(`שולח תמונה למודל Flux במידות: ${originalWidth}x${originalHeight}`, 'info');
+                showMessage(`שולח תמונה לעיבוד... (${originalWidth}x${originalHeight})`, 'info');
+                showMessage(`שולח תמונה במידות: ${originalWidth}x${originalHeight}`, 'info');
                 
                 // Send to FAL AI
                 fetch(FAL_IMAGE_URL, {
@@ -515,12 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('Image URL found:', data.images[0].url);
                         displayGeneratedImage(data.images[0].url);
                         
-                        let successMessage = 'תמונה חדשה נוצרה בהצלחה!';
-                        if (cropTo4x3) {
-                            successMessage = `תמונה חדשה נוצרה בהצלחה! (התמונה נשלחה ביחס 4:3, ${originalWidth}x${originalHeight})`;
-                        } else {
-                            successMessage = `תמונה חדשה נוצרה בהצלחה! (${originalWidth}x${originalHeight})`;
-                        }
+                        let successMessage = `תמונה חדשה נוצרה בהצלחה! (נשלחה ביחס 4:3, ${originalWidth}x${originalHeight})`;
                         
                         showMessage(successMessage, 'success');
                     } else {
