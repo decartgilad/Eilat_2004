@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Create loading message with animated GIF above text
+        // Create loading message with animated GIF above text and message area below
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'success-message loading';
         loadingDiv.innerHTML = `
@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img src="Assets/ajax-loader-small.gif" alt="טוען..." style="display: block; margin: 0 auto; margin-bottom: 15px;">
                 <br>
                 ${message}
+                <div id="messageArea" style="margin-top: 15px; min-height: 20px;"></div>
             </div>
         `;
         
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let loadingMessage = 'מתחיל לנתח את התמונה...';
             if (cropTo4x3) {
-                loadingMessage = 'מתחיל לנתח את התמונה... (התמונה תיחתך ליחס 4:3)';
+                loadingMessage = 'מתחיל לנתח את התמונה...';
             }
             
             showLoadingMessage(loadingMessage);
@@ -286,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Show appropriate message based on cropping setting
                 if (cropTo4x3) {
-                    showLoadingMessage('מנתח את התמונה... )');
+                    showLoadingMessage('מנתח את התמונה...');
                 } else {
                     showLoadingMessage('מנתח את התמונה...');
                 }
@@ -384,15 +385,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         resolve(data);
                     })
                     .catch(error => {
-                        // Remove loading message properly
-                        const container = loadingDiv.parentNode;
-                        if (container && container.className === 'message-container') {
-                            container.remove();
-                        } else {
-                            loadingDiv.remove();
-                        }
                         console.error('Error:', error);
-                        showMessage('שגיאה בעיבוד התמונה: ' + error.message, 'error');
+                        // Show error message in the message area below the loading GIF
+                        const messageArea = document.getElementById('messageArea');
+                        if (messageArea) {
+                            messageArea.innerHTML = `<div class="error-message" style="margin: 0; color: #FF0000;">שגיאה בעיבוד התמונה: ${error.message}</div>`;
+                        } else {
+                            // Fallback: show error message normally
+                            showMessage('שגיאה בעיבוד התמונה: ' + error.message, 'error');
+                        }
                         reject(error);
                     });
                 };
@@ -401,14 +402,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             } catch (error) {
                 console.error('Error compressing image:', error);
-                // Remove loading message
-                const container = loadingDiv.parentNode;
-                if (container && container.className === 'message-container') {
-                    container.remove();
+                // Show error message in the message area below the loading GIF
+                const messageArea = document.getElementById('messageArea');
+                if (messageArea) {
+                    messageArea.innerHTML = `<div class="error-message" style="margin: 0; color: #FF0000;">שגיאה בדחיסת התמונה: ${error.message}</div>`;
                 } else {
-                    loadingDiv.remove();
+                    // Fallback: show error message normally
+                    showMessage('שגיאה בדחיסת התמונה: ' + error.message, 'error');
                 }
-                showMessage('שגיאה בדחיסת התמונה: ' + error.message, 'error');
                 reject(error);
             }
         });
@@ -526,22 +527,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         console.error('No image URL in FAL AI response:', data);
                         console.error('Response keys:', Object.keys(data));
-                        if (data.images) {
-                            console.error('Images array:', data.images);
-                        }
+                                            if (data.images) {
+                        console.error('Images array:', data.images);
+                    }
+                    // Show error message in the message area below the loading GIF
+                    const messageArea = document.getElementById('messageArea');
+                    if (messageArea) {
+                        messageArea.innerHTML = '<div class="error-message" style="margin: 0; color: #FF0000;">שגיאה: לא התקבלה תמונה מהמערכת</div>';
+                    } else {
+                        // Fallback: show error message normally
                         showMessage('שגיאה: לא התקבלה תמונה מהמערכת', 'error');
+                    }
                     }
                 })
                 .catch(error => {
-                    // Remove loading message properly
-                    const container = loadingDiv.parentNode;
-                    if (container && container.className === 'message-container') {
-                        container.remove();
-                    } else {
-                        loadingDiv.remove();
-                    }
                     console.error('FAL AI Error:', error);
-                    showMessage('שגיאה ביצירת התמונה: ' + error.message, 'error');
+                    // Show error message in the message area below the loading GIF
+                    const messageArea = document.getElementById('messageArea');
+                    if (messageArea) {
+                        messageArea.innerHTML = `<div class="error-message" style="margin: 0; color: #FF0000;">שגיאה ביצירת התמונה: ${error.message}</div>`;
+                    } else {
+                        // Fallback: show error message normally
+                        showMessage('שגיאה ביצירת התמונה: ' + error.message, 'error');
+                    }
                 });
             };
             
@@ -561,6 +569,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Display the generated image
     function displayGeneratedImage(imageUrl) {
         console.log('Displaying generated image:', imageUrl);
+        
+        // Show success message in the message area below the loading GIF
+        const messageArea = document.getElementById('messageArea');
+        if (messageArea) {
+            messageArea.innerHTML = '<div class="success-message" style="margin: 0; color: #008000;">תמונה נוצרה בהצלחה! 🎉</div>';
+        }
         
         // Create or update the generated image section
         let generatedSection = document.getElementById('generatedSection');
@@ -614,7 +628,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function showMessage(message, type) {
         console.log('showMessage called:', message, type);
         
-        // Remove existing messages (but only the message div, not containers)
+        // Check if there's an active loading message with messageArea
+        const messageArea = document.getElementById('messageArea');
+        if (messageArea) {
+            // Display message in the existing message area below the loading GIF
+            messageArea.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}" style="margin: 0;">${message}</div>`;
+            return;
+        }
+        
+        // Fallback: Remove existing messages (but only the message div, not containers)
         const existingMessages = document.querySelectorAll('.error-message, .success-message');
         existingMessages.forEach(msg => {
             if (!msg.classList.contains('loading')) {
@@ -628,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Create new message with 2004 style
+        // Create new message with 2004 style (fallback when no loading message is active)
         const messageDiv = document.createElement('div');
         messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
         messageDiv.innerHTML = message;
