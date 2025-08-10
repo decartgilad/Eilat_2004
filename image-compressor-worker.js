@@ -77,9 +77,9 @@ self.onmessage = async function(e) {
             );
         }
         
-        // Convert to WebP blob with specified quality
+        // Convert to JPEG blob with specified quality (FAL Flux prefers JPEG/PNG over WebP)
         const blob = await canvas.convertToBlob({
-            type: 'image/webp',
+            type: 'image/jpeg',
             quality: quality
         });
         
